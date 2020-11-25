@@ -3,6 +3,14 @@
     Date: 10/11/2020
     Copyright ©2020
 """
+
+import numpy as np
+import json
+import ast
+
+classByVal = {0: 'encryption', 1 : 'sort', 2 : 'math', 3 : 'string'}
+valByClass = {'encryption' : 0, 'sort' : 1, 'math' : 2, 'string': 3}
+
 def find_root(cfg):
     """
     Find a root node for the given cfg
@@ -119,3 +127,25 @@ def get_features(list_asm, cfg, normalization_func=lambda x: x):
     final.extend([loops, maxComplexity])
     
     return list(map(normalization_func,final))
+
+
+def parseDataset(dataset_path, training_data=True):
+    # reading jsonl and preparing dataset
+    data = []
+    with open(dataset_path, 'r') as f:
+        for e in f:
+            v = json.loads(e)
+            row = get_features(ast.literal_eval(v['lista_asm']), v['cfg'])
+            if training_data:
+                row.append(valByClass[v['semantic']])
+            data += [row]
+
+    # convert to numpy array
+    data = np.array(data)
+    if training_data:
+        # extract X and y from data
+        X_all = np.log2(data[:,:-1]+1)
+        y_all = data[:, -1]
+        return X_all, y_all
+    else:
+        return np.log2(data+1)
