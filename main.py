@@ -9,74 +9,87 @@ from utils import *
 import json
 import ast
 
+# sklearn
 from sklearn.model_selection import *
 from sklearn import svm
 from sklearn import tree
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LogisticRegression
 
+# sklearn metrics
+from sklearn.metrics import plot_confusion_matrix, classification_report, confusion_matrix
+
+# matplot
+import matplotlib.pyplot as plt
+
+# numpy arrays
 import numpy as np
-from math import log2
+
+
+TEST_SIZE = 0.33
+MODEL = 'SVMa'
 
 if __name__ == "__main__":
-
-    # class mapping : string -> {0,...,n}, n = 3
-    classByVal = {0: 'encryption', 1 : 'sort', 2 : 'math', 3 : 'string'}
-    valByClass = {'encryption' : 0, 'sort' : 1, 'math' : 2, 'string': 3}
-
-    # reading jsonl and preparing dataset
-    data = []
-    print('Preparing the dataset...')
-    with open('dataset.json', 'r') as f:
-        for e in f:
-            v = json.loads(e)
-            row = get_features(ast.literal_eval(v['lista_asm']), v['cfg'], normalization_func=lambda x: log2(x+1))
-            row.append(valByClass[v['semantic']])
-            data += [row]
-
-    # convert to numpy array
-    data = np.array(data)
+    # dataset_path
+    dataset_path = 'noduplicatedataset.json' # 'dataset.json' 'noduplicatedataset.json' 'blindtest.json' 'nodupblindtest.json'
     
-    # extract X and y from data
-    X_all = data[:,:-1]
-    y_all = data[:, -1]
+    print("Parsing the dataset..")
 
-    print("The dataset has been prepared.")
+    # get the dataset
+    X_all, y_all = parseDataset(dataset_path)
+
+    print("The dataset has been parsed.")
+    print("X: ")
+    print(X_all)
+    print("y: ")
+    print(y_all)
 
     # split data
-    print("Splitting the data...")
-    X_train, X_test, y_train, y_test = train_test_split(X_all, y_all, test_size=0.33, random_state=117)
+    print(f"Splitting the data, test size: {TEST_SIZE}")
+    X_train, X_test, y_train, y_test = train_test_split(X_all, y_all, test_size=TEST_SIZE, random_state=117)
     print("Splitting completed.")
 
-
-    # SVM  ~0.863 accuracy
-    model = svm.SVC(kernel='linear', C=1)
-
-    # Bayes ~0.723 accuracy
-    # model = GaussianNB()
-
-    # Decision Tree ~0.95 accuracy
-    # model = tree.DecisionTreeClassifier()
+    if MODEL == 'SVM':
+        # SVM  ~0.863 accuracy
+        model = svm.SVC(kernel='linear', C=1)
+    else:
+        # Decision Tree ~0.95 accuracy
+        model = tree.DecisionTreeClassifier()
 
     print("\n--- Using",type(model).__name__, "model ---\n")
 
     print("Fitting the model...")
     model.fit(X_train, y_train)
     print("Fit completed.")
-    acc = model.score(X_test, y_test)    
-    print("Accuracy %.3f" %acc)
+    
+    # Prediction
+    y_pred = model.predict(X_test)
+
+    # --- Scores ---
+    report = classification_report(y_test, y_pred)
+    print(report)
+
+    # Confusion matrix (terminal)
+    cm = confusion_matrix(y_test, y_pred)
+    print("Confusion matrix:")
+    print(cm)
+
+    # Confusion matrix (plt)
+    matrix = plot_confusion_matrix(model, X_test, y_test, cmap=plt.cm.Blues, values_format='')
+    matrix.ax_.set_title("Confusion matrix", color="black")
+    # plt.show()
+
+    # --- END Scores ---
 
 
-    # data2 = []
-    # with open('blindtest.json', 'r') as f:
-    #     for e in f:
-    #         v = json.loads(e)
-    #         row = get_features(ast.literal_eval(v['lista_asm']), v['cfg'], normalization_func=lambda x: log2(x+1))
-    #         data2.append(row)
-    # data2 = np.array(data2)
+    # BLINDTEST OF MODEL
+    print("Blindtest begin")
+    data2 = parseDataset('blindtest.json', False)
 
-    # prediction = model.predict(data2[1:2, :])
-    # print("Predicted", prediction)
+    prediction = model.predict(data2)
+    prediction = np.vectorize(classByVal.__getitem__)(prediction)
+    print("Predicted", prediction)
+    np.savetxt('blindtest_DT.txt', prediction, fmt="%s")
     
 
                    
