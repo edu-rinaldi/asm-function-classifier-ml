@@ -21,9 +21,8 @@ First check requirements:
 pip install -r requirements
 ```
 
-then to train and test the model just run the `main.py` file
+then to train and test the model just run the `main.py` file:
 
 ```bash
 python3 main.py
 ```
-
