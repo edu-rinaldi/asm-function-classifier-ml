@@ -18,7 +18,7 @@ The second one seems to perform better, so I suggest to use it.
 First check requirements:
 
 ```bash
-pip install -r requirements
+pip install -r requirements.txt
 ```
 
 then to train and test the model just run the `main.py` file:
