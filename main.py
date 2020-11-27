@@ -17,7 +17,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LogisticRegression
 
 # sklearn metrics
-from sklearn.metrics import plot_confusion_matrix, classification_report, confusion_matrix
+from sklearn.metrics import plot_confusion_matrix, classification_report, confusion_matrix, f1_score, recall_score, precision_score
 
 # matplot
 import matplotlib.pyplot as plt
@@ -27,11 +27,11 @@ import numpy as np
 
 
 TEST_SIZE = 0.33
-MODEL = 'SVMa'
+MODEL = 'SVM'
 
 if __name__ == "__main__":
     # dataset_path
-    dataset_path = 'noduplicatedataset.json' # 'dataset.json' 'noduplicatedataset.json' 'blindtest.json' 'nodupblindtest.json'
+    dataset_path = 'noduplicatedataset.json' # 'dataset.json' 'noduplicatedataset.json' 
     
     print("Parsing the dataset..")
 
@@ -43,6 +43,9 @@ if __name__ == "__main__":
     print(X_all)
     print("y: ")
     print(y_all)
+
+    print(f"X shape {X_all.shape}")
+    print(f"y shape {y_all.shape}")
 
     # split data
     print(f"Splitting the data, test size: {TEST_SIZE}")
@@ -69,27 +72,35 @@ if __name__ == "__main__":
     report = classification_report(y_test, y_pred)
     print(report)
 
+    # precision
+    precision = precision_score(y_test, y_pred, average='macro')
+    # recall
+    recall = recall_score(y_test, y_pred, average='macro')
+    # f1-score
+    f1 = f1_score(y_test, y_pred, average='macro')
+    print(precision, recall, f1)
+
     # Confusion matrix (terminal)
     cm = confusion_matrix(y_test, y_pred)
     print("Confusion matrix:")
     print(cm)
 
     # Confusion matrix (plt)
-    matrix = plot_confusion_matrix(model, X_test, y_test, cmap=plt.cm.Blues, values_format='')
-    matrix.ax_.set_title("Confusion matrix", color="black")
+    # matrix = plot_confusion_matrix(model, X_test, y_test, cmap=plt.cm.Blues, values_format='')
+    # matrix.ax_.set_title("Confusion matrix", color="black")
     # plt.show()
 
     # --- END Scores ---
 
 
-    # BLINDTEST OF MODEL
-    print("Blindtest begin")
-    data2 = parseDataset('blindtest.json', False)
+    # # BLINDTEST OF MODEL
+    # print("Blindtest begin")
+    # data2 = parseDataset('blindtest.json', False)
 
-    prediction = model.predict(data2)
-    prediction = np.vectorize(classByVal.__getitem__)(prediction)
-    print("Predicted", prediction)
-    np.savetxt('blindtest_DT.txt', prediction, fmt="%s")
+    # prediction = model.predict(data2)
+    # prediction = np.vectorize(classByVal.__getitem__)(prediction)
+    # print("Predicted", prediction)
+    # np.savetxt('blindtest_DT.txt', prediction, fmt="%s")
     
 
                    

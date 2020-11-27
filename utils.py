@@ -77,7 +77,7 @@ def tarjan(cfg):
 def get_features(list_asm, cfg, normalization_func=lambda x: x):
     """
         :params list_asm: list of asm instructions
-        :returns a list such that [#bitwiseOPs, #movOPs, #xmmm*, #arithmeticOPs, #cmpOPs, #swapOPs, #loops, #maxComplexity]
+        :returns a list such that [#bitwiseOPs, #istr,#movOPs, #xmmm*, #arithmeticOPs, #cmpOPs, #swapOPs, #loops, #maxComplexity, #components]
     """
 
     
@@ -124,7 +124,7 @@ def get_features(list_asm, cfg, normalization_func=lambda x: x):
             # n nodes in a component --> n-1 nested loops
             maxComplexity = max(maxComplexity, lenComp-1)
 
-    final.extend([loops, maxComplexity])
+    final.extend([loops, maxComplexity, len(components)])
     
     return list(map(normalization_func,final))
 
@@ -145,6 +145,7 @@ def parseDataset(dataset_path, training_data=True):
     if training_data:
         # extract X and y from data
         X_all = np.log2(data[:,:-1]+1)
+        # X_all = data[:,:-1]
         y_all = data[:, -1]
         return X_all, y_all
     else:
