@@ -2,6 +2,11 @@ from scipy.spatial.distance import hamming, cosine
 import numpy as np
 from sys import argv
 
+"""
+Given two blindset output as input it returns a similarity between them
+"""
+
+
 if __name__ == "__main__":
     if len(argv) < 3:
         print("ERROR: v1 v2 args needed")

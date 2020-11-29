@@ -26,8 +26,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-TEST_SIZE = 0.33
-MODEL = 'SVM'
+TEST_SIZE = 0.50
+MODEL = 'DT'
 
 if __name__ == "__main__":
     # dataset_path
@@ -53,14 +53,16 @@ if __name__ == "__main__":
     print("Splitting completed.")
 
     if MODEL == 'SVM':
-        # SVM  ~0.863 accuracy
+        # SVM
         model = svm.SVC(kernel='linear', C=1)
     else:
-        # Decision Tree ~0.95 accuracy
+        # Decision Tree 
         model = tree.DecisionTreeClassifier()
 
     print("\n--- Using",type(model).__name__, "model ---\n")
 
+
+    # Fitting the model
     print("Fitting the model...")
     model.fit(X_train, y_train)
     print("Fit completed.")
@@ -68,17 +70,17 @@ if __name__ == "__main__":
     # Prediction
     y_pred = model.predict(X_test)
 
-    # --- Scores ---
+    # --- Scores grouped ---
     report = classification_report(y_test, y_pred)
     print(report)
 
+    # Singular scores
     # precision
     precision = precision_score(y_test, y_pred, average='macro')
     # recall
     recall = recall_score(y_test, y_pred, average='macro')
     # f1-score
     f1 = f1_score(y_test, y_pred, average='macro')
-    print(precision, recall, f1)
 
     # Confusion matrix (terminal)
     cm = confusion_matrix(y_test, y_pred)
@@ -93,14 +95,14 @@ if __name__ == "__main__":
     # --- END Scores ---
 
 
-    # # BLINDTEST OF MODEL
-    # print("Blindtest begin")
-    # data2 = parseDataset('blindtest.json', False)
+    # BLINDTEST OF MODEL
+    print("Blindtest begin")
+    data2 = parseDataset('blindtest.json', False)
 
-    # prediction = model.predict(data2)
-    # prediction = np.vectorize(classByVal.__getitem__)(prediction)
-    # print("Predicted", prediction)
-    # np.savetxt('blindtest_DT.txt', prediction, fmt="%s")
+    prediction = model.predict(data2)
+    prediction = np.vectorize(classByVal.__getitem__)(prediction)
+    print("Predicted", prediction)
+    np.savetxt('1797800.txt', prediction, fmt="%s")
     
 
                    

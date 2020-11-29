@@ -145,7 +145,6 @@ def parseDataset(dataset_path, training_data=True):
     if training_data:
         # extract X and y from data
         X_all = np.log2(data[:,:-1]+1)
-        # X_all = data[:,:-1]
         y_all = data[:, -1]
         return X_all, y_all
     else:
